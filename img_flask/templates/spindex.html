@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Communication System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .prediction, .speech {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #speechResult {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AI Communication System for Specially Abled</h1>
+    
+    <!-- Image Prediction Form -->
+    <div class="section">
+        <h2>Image Prediction (ASL or Gesture)</h2>
+        <form id="predictForm" action="/predict" method="POST" enctype="multipart/form-data">
+            <label for="model_type">Choose Model Type:</label>
+            <select name="model_type" id="model_type" required>
+                <option value="asl">American Sign Language (ASL)</option>
+                <option value="gesture">Gesture Recognition</option>
+            </select>
+
+            <input type="file" name="file" id="file" required />
+            <button type="submit">Submit Image</button>
+        </form>
+        <div class="prediction" id="imagePrediction">{{ image_prediction }}</div>
+    </div>
+
+    <!-- Speech-to-Text Form -->
+    <div class="section">
+        <h2>Speech-to-Text Conversion</h2>
+        <button id="startBtn">Start Speech Recognition</button>
+        <p id="transcribedText">{{ speech_text }}</p>
+        <form id="speechForm" action="/predict" method="POST">
+            <input type="hidden" name="model_type" id="model_type_speech" value="speech_to_text" />
+            <input type="hidden" name="text" id="speechText" />
+        </form>
+        <div class="speech" id="speechResult">{{ speech_text }}</div>
+    </div>
+
+    <script>
+        // Speech-to-Text functionality using Web Speech API
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const speechText = event.results[0][0].transcript;
+                document.getElementById('transcribedText').innerText = "You said: " + speechText;
+                
+                // Populate hidden input field with speech text
+                document.getElementById('speechText').value = speechText;
+
+                // Set model type for speech-to-text
+                document.getElementById('model_type_speech').value = 'speech_to_text';
+
+                // Submit the form
+                document.getElementById('speechForm').submit();
+            };
+
+            recognition.onerror = function(event) {
+                alert("Speech recognition error: " + event.error);
+            };
+
+            document.getElementById('startBtn').onclick = function() {
+                recognition.start();
+            };
+        } else {
+            alert("Your browser does not support Speech Recognition.");
+        }
+    </script>
+
+</body>
+</html>

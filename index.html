@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASL and Gesture Prediction</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 400px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+select, input[type="file"] {
+    padding: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#predictionResult {
+    margin-top: 20px;
+}
+
+#prediction {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ASL and Gesture Prediction</h1>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <label for="model_type">Select Model:</label>
+            <select id="model_type" name="model_type">
+                <option value="asl">ASL</option>
+                <option value="gesture">Gesture</option>
+            </select>
+            <br><br>
+            <label for="file">Upload Image:</label>
+            <input type="file" id="file" name="file" required>
+            <br><br>
+            <button type="submit">Predict</button>
+        </form>
+
+        <div id="predictionResult">
+            <h2>Prediction: </h2>
+            <p id="prediction"></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('prediction').innerText = result.prediction || result.error;
+        };
+        
+    </script>
+</body>
+</html>
